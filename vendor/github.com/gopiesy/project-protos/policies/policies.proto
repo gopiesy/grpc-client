@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package policies;
+option go_package = "proto/policies";
+
+// PolicyState represent the status of a single policy
+message PolicyState {
+  string Name = 1;
+  oneof Deployed {
+    bool Success = 2; // is true when new policy is deployed
+    string Error = 3; // is set when a policy fail deployment
+  }
+}
+
+// SnapshotStatus is reported by Fetcher in response to GetSnapshots
+message SnapshotStatus {
+  string SnapshotName = 1;
+  repeated PolicyState PolicyStatus = 2;
+}
+
+// Snapshot represent the latest policy dump on the server
+message Snapshot {
+  string Name = 1;
+  google.protobuf.Timestamp Time = 2;
+  repeated bytes Data = 3;
+}
+
+service PolicyService {
+  // StreamSnapshots implemented by GT to continuesly stream snapshots and get
+  // the status
+  rpc StreamSnapshots(stream SnapshotStatus) returns (stream Snapshot) {}
+}
