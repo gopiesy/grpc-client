@@ -26,7 +26,7 @@ func runExecute(client policies.PolicyServiceClient) {
 	}
 
 	for {
-		if *count != 0 {
+		if *count > 0 {
 			snapshot, err := stream.Recv()
 			if err != nil {
 				if err == io.EOF {
@@ -44,10 +44,13 @@ func runExecute(client policies.PolicyServiceClient) {
 			if err := stream.Send(&status); err != nil {
 				log.Fatalf("Err in Send: %v", err)
 			}
-		}
-		log.Println("Bye Bye server")
-		if err := stream.CloseSend(); err != nil {
-			log.Fatal(err)
+			log.Println("Ack Sent")
+		} else {
+			log.Println("Bye Bye server")
+			if e := stream.CloseSend(); e != nil {
+				log.Fatalln(e)
+			}
+			return
 		}
 	}
 }

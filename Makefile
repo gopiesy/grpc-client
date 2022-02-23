@@ -1,6 +1,6 @@
 GO_PKG_DIRS  := $(subst $(shell go list -e -m),.,$(shell go list ./ | grep -v /vendor/ ))
 
-all:
+all: clean fmt lint
 	go build -ldflags="-s -w" -o client $(GO_PKG_DIRS)
 
 fmt:
